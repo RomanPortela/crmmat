@@ -153,6 +153,5 @@ CREATE TRIGGER appointments_updated_at
 
 INSERT INTO crm_users (name, email, password, role)
 VALUES ('Roman Portela', 'portelaroman21@gmail.com', 
-        '$2a$10$8chH.HXqaQ1GCcQjlOymUOIyPGZ.WReWOcXUZoQ//HcJYwsegOh/O', 
-        'admin')
-ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password;
+        'admin123', 
+        'admin');
