@@ -151,7 +151,18 @@ CREATE TRIGGER appointments_updated_at
   BEFORE UPDATE ON appointments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+-- ============================================
+-- Creación de Usuario Administrador por Defecto
+-- ============================================
+
+-- 1. Limpiamos cualquier registro previo con ese email
+DELETE FROM crm_users WHERE email = 'portelaroman21@gmail.com';
+
+-- 2. Insertamos el usuario con la contraseña hasheada
 INSERT INTO crm_users (name, email, password, role)
-VALUES ('Roman Portela', 'portelaroman21@gmail.com', 
-        'admin123', 
-        'admin');
+VALUES (
+  'Roman Portela', 
+  'portelaroman21@gmail.com', 
+  '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW', 
+  'admin'
+);
