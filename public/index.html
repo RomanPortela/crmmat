@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Altech CRM</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen" class="login-screen hidden">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-mark">A</div>
+      <div>
+        <h1>Altech CRM</h1>
+        <p>Gestión de ventas</p>
+      </div>
+    </div>
+    <form id="login-form">
+      <div class="field"><label>Email</label><input type="email" id="email" placeholder="tu@email.com" required /></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="password" placeholder="••••••••" required /></div>
+      <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
+      <p id="login-error" class="error-msg hidden"></p>
+    </form>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" class="app hidden">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">A</div>
+      <span>Altech</span>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="#" data-view="dashboard" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg>Dashboard</a></li>
+      <li><a href="#" data-view="pipeline" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>Pipeline</a></li>
+      <li><a href="#" data-view="contacts" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Contactos</a></li>
+      <li><a href="#" data-view="appointments" class="nav-item"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Turnos</a></li>
+      <li><a href="#" data-view="sales" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Ventas</a></li>
+      <li><a href="#" data-view="reports" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/><path d="M5 9h4v10H5zm6-4h4v14h-4zm6 8h2v6h-2z"/></svg>Reportes</a></li>
+      <li><a href="#" data-view="settings" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>Configuración</a></li>
+    </ul>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar">M</div>
+      <div class="user-info">
+        <span id="user-name">—</span>
+        <button id="logout-btn" class="btn-link">Salir</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <div class="page-header">
+        <div><h2>Dashboard</h2><span id="dashboard-date" class="text-muted"></span></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card accent"><div class="kpi-label">Leads hoy</div><div class="kpi-value" id="kpi-leads">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Turnos hoy</div><div class="kpi-value" id="kpi-turnos">—</div></div>
+        <div class="kpi-card green"><div class="kpi-label">Ventas semana</div><div class="kpi-value" id="kpi-ventas">—</div><div class="kpi-sub" id="kpi-ventas-usd"></div></div>
+        <div class="kpi-card"><div class="kpi-label">Conversión 30d</div><div class="kpi-value" id="kpi-conv">—</div></div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="card"><h3 class="card-title">Pipeline activo</h3><div id="pipeline-summary"></div></div>
+        <div class="card"><h3 class="card-title">Próximos turnos</h3><div id="turnos-proximos"></div></div>
+      </div>
+      <div class="card mt-4"><h3 class="card-title">Últimas ventas</h3><div id="ventas-recientes"></div></div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section id="view-pipeline" class="view hidden">
+      <div class="page-header">
+        <div><h2>Pipeline</h2></div>
+        <div class="header-actions">
+          <input type="search" id="pipeline-search" placeholder="Buscar lead..." class="search-input" />
+          <button class="btn btn-primary" onclick="openModal('modal-new-lead')">+ Nuevo lead</button>
+        </div>
+      </div>
+      <div id="kanban-board" class="kanban-board"></div>
+    </section>
+
+    <!-- CONTACTOS -->
+    <section id="view-contacts" class="view hidden">
+      <div class="page-header">
+        <div><h2>Contactos</h2></div>
+        <div class="header-actions">
+          <select id="contacts-stage-filter" class="select-input"><option value="">Todas las etapas</option></select>
+          <input type="search" id="contacts-search" placeholder="Nombre o teléfono..." class="search-input" />
+          <button class="btn btn-primary" onclick="openModal('modal-new-lead')">+ Nuevo</button>
+        </div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Nombre</th><th>Teléfono</th><th>Ciudad</th><th>Etapa</th><th>Interés</th><th>Último contacto</th><th></th></tr></thead>
+          <tbody id="contacts-table-body"></tbody>
+        </table>
+        <div id="contacts-pagination" class="pagination"></div>
+      </div>
+    </section>
+
+    <!-- TURNOS -->
+    <section id="view-appointments" class="view hidden">
+      <div class="page-header">
+        <div><h2>Turnos</h2></div>
+        <div class="header-actions">
+          <input type="date" id="apt-filter-date" class="select-input" />
+          <select id="apt-filter-status" class="select-input">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="confirmado">Confirmados</option>
+            <option value="completado">Completados</option>
+            <option value="cancelado">Cancelados</option>
+            <option value="no_vino">No vino</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('modal-new-appointment')">+ Nuevo turno</button>
+        </div>
+      </div>
+      <div id="appointments-list" class="appointments-list"></div>
+    </section>
+
+    <!-- VENTAS -->
+    <section id="view-sales" class="view hidden">
+      <div class="page-header">
+        <div><h2>Ventas</h2></div>
+        <div class="header-actions">
+          <input type="month" id="sales-filter-month" class="select-input" />
+          <button class="btn btn-primary" onclick="openModal('modal-new-sale')">+ Registrar venta</button>
+        </div>
+      </div>
+      <div class="stats-row" id="sales-stats"></div>
+      <div class="card mt-4">
+        <table class="data-table">
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Precio USD</th><th>Pago</th><th>Canje</th></tr></thead>
+          <tbody id="sales-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- REPORTES -->
+    <section id="view-reports" class="view hidden">
+      <div class="page-header">
+        <div><h2>Reportes</h2></div>
+        <div class="header-actions">
+          <select id="reports-period" class="select-input">
+            <option value="7">Últimos 7 días</option>
+            <option value="30" selected>Últimos 30 días</option>
+            <option value="90">Últimos 90 días</option>
+          </select>
+          <button class="btn btn-ghost" onclick="exportCSV('contacts')">↓ Contactos CSV</button>
+          <button class="btn btn-ghost" onclick="exportCSV('sales')">↓ Ventas CSV</button>
+        </div>
+      </div>
+      <div id="reports-kpis" class="kpi-grid"></div>
+      <div class="dashboard-grid mt-4">
+        <div class="card" style="grid-column:1/-1">
+          <h3 class="card-title">Ventas diarias (USD)</h3>
+          <canvas id="chart-ventas" height="80"></canvas>
+        </div>
+      </div>
+      <div class="dashboard-grid mt-4">
+        <div class="card">
+          <h3 class="card-title">Pipeline — Distribución</h3>
+          <canvas id="chart-funnel" height="160"></canvas>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Métodos de pago</h3>
+          <canvas id="chart-pagos" height="160"></canvas>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <h3 class="card-title">Modelos más vendidos (últimos 90 días)</h3>
+        <div id="modelos-top-list"></div>
+      </div>
+    </section>
+
+    <!-- CONFIGURACIÓN -->
+    <section id="view-settings" class="view hidden">
+      <div class="page-header">
+        <div><h2>Configuración</h2></div>
+        <div class="header-actions" id="settings-admin-btn"></div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3 class="card-title">Cambiar contraseña</h3>
+          <form id="form-change-password" style="display:flex;flex-direction:column;gap:.65rem;margin-top:.5rem">
+            <div class="field"><label>Contraseña actual</label><input type="password" name="current" required /></div>
+            <div class="field"><label>Nueva contraseña</label><input type="password" name="newPassword" required /></div>
+            <div class="field"><label>Confirmar nueva</label><input type="password" name="confirm" required /></div>
+            <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+          </form>
+        </div>
+        <div class="card" id="users-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+            <h3 class="card-title" style="margin-bottom:0">Usuarios del CRM</h3>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-new-user')">+ Agregar</button>
+          </div>
+          <div id="users-list"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ════ MODALS ════════════════════════════════ -->
+
+<!-- Nuevo lead -->
+<div id="modal-new-lead" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-lead')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Nuevo lead</h3><button class="modal-close" onclick="closeModal('modal-new-lead')">✕</button></div>
+    <form id="form-new-lead" class="modal-form">
+      <div class="form-grid">
+        <div class="field"><label>Nombre</label><input type="text" name="name" placeholder="Nombre del cliente" /></div>
+        <div class="field"><label>Teléfono *</label><input type="text" name="phone" placeholder="+549291..." required /></div>
+        <div class="field"><label>Equipo que busca</label><input type="text" name="product_interest" placeholder="iPhone 15 Pro..." /></div>
+        <div class="field"><label>Fuente</label><select name="source"><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="referido">Referido</option><option value="local">Local</option></select></div>
+        <div class="field"><label>Primer iPhone</label><select name="is_first_iphone"><option value="">No sé</option><option value="true">Sí</option><option value="false">No</option></select></div>
+        <div class="field"><label>iPhone actual</label><input type="text" name="current_device" placeholder="iPhone 13..." /></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="agent_notes" rows="2" placeholder="Observaciones..."></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-lead')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Cambiar etapa -->
+<div id="modal-stage" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-stage')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Mover etapa</h3><button class="modal-close" onclick="closeModal('modal-stage')">✕</button></div>
+    <div class="modal-form">
+      <p class="text-muted" id="stage-contact-name" style="margin-bottom:1rem"></p>
+      <div id="stage-buttons" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+      <div id="stage-lost-reason" class="field hidden" style="margin-top:0.75rem">
+        <label>Motivo de pérdida</label>
+        <input type="text" id="lost-reason-input" placeholder="¿Por qué no compró?" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-stage')">Cancelar</button>
+        <button class="btn btn-primary" id="stage-confirm-btn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Nuevo turno -->
+<div id="modal-new-appointment" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-appointment')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Nuevo turno</h3><button class="modal-close" onclick="closeModal('modal-new-appointment')">✕</button></div>
+    <form id="form-new-appointment" class="modal-form">
+      <div class="form-grid">
+        <div class="field"><label>Contacto (teléfono) *</label><input type="text" name="phone" placeholder="+549291..." required /></div>
+        <div class="field"><label>Fecha y hora *</label><input type="datetime-local" name="scheduled_at" required /></div>
+        <div class="field"><label>Equipo de interés</label><input type="text" name="product_interested" placeholder="iPhone 15 Pro..." /></div>
+        <div class="field"><label>¿Tiene canje?</label><select name="has_trade_in"><option value="false">No</option><option value="true">Sí</option></select></div>
+        <div class="field"><label>¿Dejó seña?</label><select name="seña_paid"><option value="false">No</option><option value="true">Sí ($30.000)</option></select></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2" placeholder="Observaciones del turno..."></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-appointment')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Agendar turno</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Registrar venta -->
+<div id="modal-new-sale" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-sale')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Registrar venta</h3><button class="modal-close" onclick="closeModal('modal-new-sale')">✕</button></div>
+    <form id="form-new-sale" class="modal-form">
+      <div class="form-grid">
+        <div class="field"><label>Teléfono cliente *</label><input type="text" name="phone" placeholder="+549291..." required /></div>
+        <div class="field"><label>Producto *</label><input type="text" name="product_name" placeholder="iPhone 15 Pro 128GB" required /></div>
+        <div class="field"><label>Precio USD *</label><input type="number" name="price_usd" placeholder="650" step="0.01" required /></div>
+        <div class="field"><label>Cotización del día</label><input type="number" name="cotizacion" placeholder="1540" /></div>
+        <div class="field"><label>Forma de pago</label>
+          <select name="payment_method" id="sale-payment-method">
+            <option value="efectivo_pesos">Efectivo pesos</option>
+            <option value="efectivo_usd">Efectivo USD</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="tarjeta">Tarjeta de crédito</option>
+            <option value="credito_personal">Crédito personal DNI</option>
+          </select>
+        </div>
+        <div class="field" id="sale-cuotas-field" style="display:none"><label>Cuotas</label><select name="cuotas"><option value="1">1 cuota (+12%)</option><option value="3">3 cuotas (+35%)</option><option value="6">6 cuotas (+50%)</option></select></div>
+        <div class="field"><label>Valor canje (USD)</label><input type="number" name="trade_in_value" placeholder="0" value="0" step="0.01" /></div>
+        <div class="field"><label>¿Con cargador? (+$30.000)</label><select name="accessories"><option value="false">No</option><option value="true">Sí</option></select></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2" placeholder="Observaciones..."></textarea></div>
+      <div id="sale-total-preview" class="sale-preview hidden"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-sale')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Registrar venta</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Detalle contacto -->
+<div id="modal-contact" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-contact')"></div>
+  <div class="modal-box modal-box-lg">
+    <div class="modal-header">
+      <h3 id="modal-contact-title">—</h3>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <button class="btn btn-ghost btn-sm" id="modal-contact-wa">WhatsApp ↗</button>
+        <button class="modal-close" onclick="closeModal('modal-contact')">✕</button>
+      </div>
+    </div>
+    <div id="modal-contact-body"></div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Modal nuevo usuario -->
+<div id="modal-new-user" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-user')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Nuevo usuario</h3><button class="modal-close" onclick="closeModal('modal-new-user')">✕</button></div>
+    <form id="form-new-user" class="modal-form">
+      <div class="field"><label>Nombre</label><input type="text" name="name" required /></div>
+      <div class="field"><label>Email</label><input type="email" name="email" required /></div>
+      <div class="field"><label>Contraseña</label><input type="password" name="password" required /></div>
+      <div class="field"><label>Rol</label><select name="role"><option value="agent">Agente</option><option value="admin">Admin</option></select></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-user')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear usuario</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal agregar nota -->
+<div id="modal-add-note" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-add-note')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Agregar nota</h3><button class="modal-close" onclick="closeModal('modal-add-note')">✕</button></div>
+    <div class="modal-form">
+      <div class="field"><label>Nota</label><textarea id="note-text" rows="4" placeholder="Escribí la nota..."></textarea></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-note')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitNote()">Guardar nota</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
