@@ -1,0 +1,464 @@
+-- ============================================
+-- ALTECH CRM - Schema PostgreSQL
+-- ============================================
+
+-- Contactos / Leads
+CREATE TABLE IF NOT EXISTS contacts (
+  id          SERIAL PRIMARY KEY,
+  name        VARCHAR(200),
+  phone       VARCHAR(30) UNIQUE NOT NULL,
+  whatsapp_id VARCHAR(100),
+  city        VARCHAR(100) DEFAULT 'Bahía Blanca',
+  source      VARCHAR(50) DEFAULT 'whatsapp', -- whatsapp, instagram, referido, local
+  is_first_iphone BOOLEAN DEFAULT NULL,
+  current_device  VARCHAR(100),              -- iPhone que tiene actualmente
+  notes       TEXT,
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Etapas del pipeline
+-- nuevo → contactado → interesado → propuesta → turno_agendado → ganado | perdido
+CREATE TABLE IF NOT EXISTS pipeline_stages (
+  id    SERIAL PRIMARY KEY,
+  name  VARCHAR(50) UNIQUE NOT NULL,
+  label VARCHAR(100) NOT NULL,
+  color VARCHAR(20) NOT NULL,
+  order_index INT NOT NULL
+);
+
+INSERT INTO pipeline_stages (name, label, color, order_index) VALUES
+  ('nuevo',          'Nuevo',            '#6B7280', 1),
+  ('contactado',     'Contactado',       '#3B82F6', 2),
+  ('interesado',     'Interesado',       '#8B5CF6', 3),
+  ('propuesta',      'Propuesta Enviada','#F59E0B', 4),
+  ('turno_agendado', 'Turno Agendado',   '#10B981', 5),
+  ('ganado',         'Ganado',           '#059669', 6),
+  ('perdido',        'Perdido',          '#EF4444', 7)
+ON CONFLICT (name) DO NOTHING;
+
+-- Conversaciones / Leads activos
+CREATE TABLE IF NOT EXISTS conversations (
+  id              SERIAL PRIMARY KEY,
+  contact_id      INT REFERENCES contacts(id) ON DELETE CASCADE,
+  stage           VARCHAR(50) DEFAULT 'nuevo',
+  product_interest VARCHAR(200),          -- qué modelo le interesa
+  budget_usd      DECIMAL(10,2),
+  payment_method  VARCHAR(100),
+  has_trade_in    BOOLEAN DEFAULT FALSE,
+  agent_notes     TEXT,
+  lost_reason     TEXT,
+  first_message_at TIMESTAMPTZ DEFAULT NOW(),
+  last_message_at  TIMESTAMPTZ DEFAULT NOW(),
+  closed_at       TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Turnos / Citas
+CREATE TABLE IF NOT EXISTS appointments (
+  id              SERIAL PRIMARY KEY,
+  contact_id      INT REFERENCES contacts(id) ON DELETE CASCADE,
+  conversation_id INT REFERENCES conversations(id) ON DELETE SET NULL,
+  scheduled_at    TIMESTAMPTZ NOT NULL,
+  status          VARCHAR(30) DEFAULT 'pendiente', -- pendiente, confirmado, completado, cancelado, no_vino
+  product_interested VARCHAR(200),
+  has_trade_in    BOOLEAN DEFAULT FALSE,
+  notes           TEXT,
+  seña_paid       BOOLEAN DEFAULT FALSE,
+  seña_amount     DECIMAL(10,2) DEFAULT 30000,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Canjes (trade-ins)
+CREATE TABLE IF NOT EXISTS trade_ins (
+  id                  SERIAL PRIMARY KEY,
+  contact_id          INT REFERENCES contacts(id) ON DELETE CASCADE,
+  model               VARCHAR(100) NOT NULL,
+  storage_gb          INT,
+  battery_pct         INT,
+  condition_notes     TEXT,
+  has_broken_screen   BOOLEAN DEFAULT FALSE,
+  has_broken_back     BOOLEAN DEFAULT FALSE,
+  has_no_face_id      BOOLEAN DEFAULT FALSE,
+  has_incell_screen   BOOLEAN DEFAULT FALSE,
+  estimated_value_usd DECIMAL(10,2),
+  actual_value_usd    DECIMAL(10,2),
+  status              VARCHAR(30) DEFAULT 'pendiente', -- pendiente, aceptado, rechazado
+  created_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Ventas cerradas
+CREATE TABLE IF NOT EXISTS sales (
+  id              SERIAL PRIMARY KEY,
+  contact_id      INT REFERENCES contacts(id) ON DELETE SET NULL,
+  conversation_id INT REFERENCES conversations(id) ON DELETE SET NULL,
+  appointment_id  INT REFERENCES appointments(id) ON DELETE SET NULL,
+  trade_in_id     INT REFERENCES trade_ins(id) ON DELETE SET NULL,
+  product_name    VARCHAR(200) NOT NULL,
+  product_gb      INT,
+  price_usd       DECIMAL(10,2) NOT NULL,
+  cotizacion      DECIMAL(10,2),           -- cotización del día
+  price_ars       DECIMAL(12,2),           -- precio en pesos
+  payment_method  VARCHAR(50),             -- efectivo_pesos, efectivo_usd, transferencia, tarjeta, credito_personal
+  cuotas          INT DEFAULT 1,
+  cuota_amount    DECIMAL(12,2),
+  trade_in_value  DECIMAL(10,2) DEFAULT 0, -- valor del canje aplicado
+  accessories     BOOLEAN DEFAULT FALSE,
+  accessories_amount DECIMAL(10,2) DEFAULT 0,
+  total_paid_usd  DECIMAL(10,2),
+  notes           TEXT,
+  sold_at         TIMESTAMPTZ DEFAULT NOW(),
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Usuarios del CRM (equipo Altech)
+CREATE TABLE IF NOT EXISTS crm_users (
+  id          SERIAL PRIMARY KEY,
+  name        VARCHAR(100) NOT NULL,
+  email       VARCHAR(200) UNIQUE NOT NULL,
+  password    VARCHAR(255) NOT NULL,
+  role        VARCHAR(30) DEFAULT 'agent', -- admin, agent
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Índices para performance
+CREATE INDEX IF NOT EXISTS idx_contacts_phone ON contacts(phone);
+CREATE INDEX IF NOT EXISTS idx_conversations_stage ON conversations(stage);
+CREATE INDEX IF NOT EXISTS idx_conversations_contact ON conversations(contact_id);
+CREATE INDEX IF NOT EXISTS idx_appointments_date ON appointments(scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_sales_date ON sales(sold_at);
+
+-- Trigger para updated_at automático
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS contacts_updated_at ON contacts;
+CREATE TRIGGER contacts_updated_at
+  BEFORE UPDATE ON contacts
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS conversations_updated_at ON conversations;
+CREATE TRIGGER conversations_updated_at
+  BEFORE UPDATE ON conversations
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS appointments_updated_at ON appointments;
+CREATE TRIGGER appointments_updated_at
+  BEFORE UPDATE ON appointments
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================
+-- EXPANSIÓN CRM — Nuevos módulos
+-- ============================================
+
+-- Permisos por usuario y sección
+CREATE TABLE IF NOT EXISTS role_permissions (
+  id          SERIAL PRIMARY KEY,
+  user_id     INT REFERENCES crm_users(id) ON DELETE CASCADE,
+  section     VARCHAR(50) NOT NULL,  -- dashboard, leads, clientes, productos, cobros, caja, proveedores, tareas, cotizaciones, automatizaciones, reportes, configuracion, calendario
+  can_view    BOOLEAN DEFAULT TRUE,
+  can_create  BOOLEAN DEFAULT TRUE,
+  can_edit    BOOLEAN DEFAULT TRUE,
+  can_delete  BOOLEAN DEFAULT FALSE,
+  can_export  BOOLEAN DEFAULT FALSE,
+  UNIQUE(user_id, section)
+);
+
+-- Configuración global del sistema
+CREATE TABLE IF NOT EXISTS system_config (
+  key   VARCHAR(100) PRIMARY KEY,
+  value TEXT
+);
+INSERT INTO system_config (key, value) VALUES
+  ('company_name', 'Altech Store'),
+  ('company_phone', ''),
+  ('company_address', 'Estomba 546 entrepiso B, Bahía Blanca'),
+  ('ai_enabled', 'true'),
+  ('cotizacion_dolar', '1540'),
+  ('seña_default', '30000')
+ON CONFLICT (key) DO NOTHING;
+
+-- Categorías de productos
+CREATE TABLE IF NOT EXISTS product_categories (
+  id         SERIAL PRIMARY KEY,
+  name       VARCHAR(100) UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+INSERT INTO product_categories (name) VALUES ('iPhone'),('Accesorio'),('Repuesto') ON CONFLICT DO NOTHING;
+
+-- Clientes (conversión desde lead)
+CREATE TABLE IF NOT EXISTS clients (
+  id             SERIAL PRIMARY KEY,
+  contact_id     INT REFERENCES contacts(id) ON DELETE SET NULL,
+  name           VARCHAR(100),
+  last_name      VARCHAR(100),
+  dni            VARCHAR(20),
+  phone          VARCHAR(30),
+  email          VARCHAR(200),
+  instagram      VARCHAR(100),
+  address        VARCHAR(200),
+  city           VARCHAR(100),
+  birthday       DATE,
+  notes          TEXT,
+  ai_enabled     BOOLEAN DEFAULT TRUE,
+  created_at     TIMESTAMPTZ DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_clients_phone ON clients(phone);
+CREATE INDEX IF NOT EXISTS idx_clients_dni ON clients(dni);
+
+-- Productos / Stock
+CREATE TABLE IF NOT EXISTS productos (
+  id              SERIAL PRIMARY KEY,
+  category_id     INT REFERENCES product_categories(id) ON DELETE SET NULL,
+  model           VARCHAR(100) NOT NULL,
+  color           VARCHAR(50),
+  storage_gb      INT,
+  imei            VARCHAR(30),
+  serial_number   VARCHAR(50),
+  battery_pct     INT,
+  has_face_id     BOOLEAN DEFAULT TRUE,
+  has_true_tone   BOOLEAN DEFAULT TRUE,
+  has_original_box BOOLEAN DEFAULT FALSE,
+  accessories     TEXT,
+  warranty_months INT DEFAULT 6,
+  status          VARCHAR(20) DEFAULT 'en_stock', -- en_stock, señado, vendido
+  price           DECIMAL(10,2),
+  cost            DECIMAL(10,2),
+  profit          DECIMAL(10,2) GENERATED ALWAYS AS (price - cost) STORED,
+  condition_notes TEXT,   -- pantalla rota, tapa, face id, incell, etc.
+  general_notes   TEXT,
+  supplier_id     INT,
+  client_id       INT REFERENCES clients(id) ON DELETE SET NULL,  -- cliente que compró
+  reserved_at     TIMESTAMPTZ,
+  sold_at         TIMESTAMPTZ,
+  entry_date      TIMESTAMPTZ DEFAULT NOW(),
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_productos_status ON productos(status);
+CREATE INDEX IF NOT EXISTS idx_productos_imei ON productos(imei);
+
+-- Historial de productos
+CREATE TABLE IF NOT EXISTS product_history (
+  id          SERIAL PRIMARY KEY,
+  producto_id INT REFERENCES productos(id) ON DELETE CASCADE,
+  action      VARCHAR(100) NOT NULL,
+  detail      TEXT,
+  user_id     INT REFERENCES crm_users(id) ON DELETE SET NULL,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Cobros / Pagos
+CREATE TABLE IF NOT EXISTS cobros (
+  id           SERIAL PRIMARY KEY,
+  client_id    INT REFERENCES clients(id) ON DELETE SET NULL,
+  producto_id  INT REFERENCES productos(id) ON DELETE SET NULL,
+  seller_id    INT REFERENCES crm_users(id) ON DELETE SET NULL,
+  type         VARCHAR(30) NOT NULL, -- seña, cobro_total, cobro_parcial
+  total_amount DECIMAL(12,2) NOT NULL,
+  notes        TEXT,
+  receipt_num  VARCHAR(50),
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Medios de pago de un cobro (múltiples por cobro)
+CREATE TABLE IF NOT EXISTS cobro_payments (
+  id        SERIAL PRIMARY KEY,
+  cobro_id  INT REFERENCES cobros(id) ON DELETE CASCADE,
+  method    VARCHAR(50) NOT NULL, -- efectivo_pesos, efectivo_usd, transferencia, tarjeta, credito_personal
+  amount    DECIMAL(12,2) NOT NULL,
+  notes     VARCHAR(200)
+);
+
+-- Caja — registro de capital
+CREATE TABLE IF NOT EXISTS caja_entries (
+  id                 SERIAL PRIMARY KEY,
+  cobro_id           INT REFERENCES cobros(id) ON DELETE SET NULL,
+  producto_id        INT REFERENCES productos(id) ON DELETE SET NULL,
+  price              DECIMAL(12,2),
+  cost               DECIMAL(12,2),
+  profit             DECIMAL(12,2),
+  capital_pendiente  DECIMAL(12,2),
+  ganancia_pendiente DECIMAL(12,2),
+  capital_reintegrado BOOLEAN DEFAULT FALSE,
+  ganancia_retirada   BOOLEAN DEFAULT FALSE,
+  capital_reintegrado_at TIMESTAMPTZ,
+  ganancia_retirada_at   TIMESTAMPTZ,
+  created_at         TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Calendario
+CREATE TABLE IF NOT EXISTS calendar_events (
+  id            SERIAL PRIMARY KEY,
+  title         VARCHAR(200) NOT NULL,
+  description   TEXT,
+  start_at      TIMESTAMPTZ NOT NULL,
+  end_at        TIMESTAMPTZ,
+  all_day       BOOLEAN DEFAULT FALSE,
+  type          VARCHAR(30) DEFAULT 'visita', -- visita, seña, entrega, tarea, otro
+  contact_id    INT REFERENCES contacts(id) ON DELETE SET NULL,
+  client_id     INT REFERENCES clients(id) ON DELETE SET NULL,
+  producto_id   INT REFERENCES productos(id) ON DELETE SET NULL,
+  seña_amount   DECIMAL(12,2),
+  notes         TEXT,
+  created_by    INT REFERENCES crm_users(id) ON DELETE SET NULL,
+  created_at    TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_calendar_start ON calendar_events(start_at);
+
+-- Tareas
+CREATE TABLE IF NOT EXISTS tasks (
+  id           SERIAL PRIMARY KEY,
+  title        VARCHAR(200) NOT NULL,
+  description  TEXT,
+  status       VARCHAR(20) DEFAULT 'pendiente', -- pendiente, en_progreso, completada
+  priority     VARCHAR(20) DEFAULT 'normal',    -- baja, normal, alta
+  type         VARCHAR(50) DEFAULT 'manual',    -- manual, cumpleaños, aniversario, seguimiento, etc.
+  due_date     TIMESTAMPTZ,
+  assigned_to  INT REFERENCES crm_users(id) ON DELETE SET NULL,
+  contact_id   INT REFERENCES contacts(id) ON DELETE SET NULL,
+  client_id    INT REFERENCES clients(id) ON DELETE SET NULL,
+  producto_id  INT REFERENCES productos(id) ON DELETE SET NULL,
+  completed_at TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_date);
+
+-- Proveedores
+CREATE TABLE IF NOT EXISTS suppliers (
+  id         SERIAL PRIMARY KEY,
+  name       VARCHAR(200) NOT NULL,
+  contact    VARCHAR(100),
+  phone      VARCHAR(30),
+  email      VARCHAR(200),
+  categories TEXT,
+  notes      TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Pedidos a proveedores
+CREATE TABLE IF NOT EXISTS supplier_orders (
+  id               SERIAL PRIMARY KEY,
+  supplier_id      INT REFERENCES suppliers(id) ON DELETE CASCADE,
+  status           VARCHAR(30) DEFAULT 'pendiente', -- pendiente, en_camino, llegado, cancelado
+  total_amount     DECIMAL(12,2),
+  estimated_arrival DATE,
+  actual_arrival   DATE,
+  notes            TEXT,
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  updated_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Items de pedido
+CREATE TABLE IF NOT EXISTS supplier_order_items (
+  id         SERIAL PRIMARY KEY,
+  order_id   INT REFERENCES supplier_orders(id) ON DELETE CASCADE,
+  description VARCHAR(200) NOT NULL,
+  quantity   INT DEFAULT 1,
+  unit_price DECIMAL(10,2),
+  total      DECIMAL(12,2)
+);
+
+-- Pagos a proveedores
+CREATE TABLE IF NOT EXISTS supplier_payments (
+  id          SERIAL PRIMARY KEY,
+  supplier_id INT REFERENCES suppliers(id) ON DELETE CASCADE,
+  order_id    INT REFERENCES supplier_orders(id) ON DELETE SET NULL,
+  amount      DECIMAL(12,2) NOT NULL,
+  method      VARCHAR(50),
+  paid_at     DATE DEFAULT CURRENT_DATE,
+  notes       TEXT,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Tablas de cotizaciones (trade-in)
+CREATE TABLE IF NOT EXISTS cotizacion_models (
+  id          SERIAL PRIMARY KEY,
+  model_name  VARCHAR(100) NOT NULL,
+  line        VARCHAR(20) NOT NULL, -- base, plus, pro, pro_max, se
+  is_active   BOOLEAN DEFAULT TRUE,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cotizacion_entries (
+  id           SERIAL PRIMARY KEY,
+  model_id     INT REFERENCES cotizacion_models(id) ON DELETE CASCADE,
+  storage_gb   INT NOT NULL,
+  battery_min  INT NOT NULL,
+  battery_max  INT NOT NULL,
+  base_price   DECIMAL(10,2) NOT NULL,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(model_id, storage_gb, battery_min, battery_max)
+);
+
+CREATE TABLE IF NOT EXISTS cotizacion_discounts (
+  id         SERIAL PRIMARY KEY,
+  name       VARCHAR(100) NOT NULL,
+  amount_usd DECIMAL(10,2) NOT NULL,
+  applies_to VARCHAR(50) DEFAULT 'all', -- all, iphone11, etc.
+  is_active  BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+INSERT INTO cotizacion_discounts (name, amount_usd) VALUES
+  ('Pantalla rota', 50),
+  ('Tapa trasera rota', 100),
+  ('Sin Face ID', 100),
+  ('Módulo inCell', 100),
+  ('iPhone 11 - Sin Face ID o tapa', 50)
+ON CONFLICT DO NOTHING;
+
+-- Automatizaciones
+CREATE TABLE IF NOT EXISTS automatizaciones (
+  id          SERIAL PRIMARY KEY,
+  name        VARCHAR(200) NOT NULL,
+  type        VARCHAR(50) NOT NULL, -- cumpleaños, aniversario, seguimiento_3m, seguimiento_6m, seguimiento_anual, vencimiento, etc.
+  days_offset INT DEFAULT 0,        -- días antes/después del evento
+  message     TEXT,
+  status      VARCHAR(20) DEFAULT 'activa', -- activa, desactivada, revision
+  ai_enabled  BOOLEAN DEFAULT FALSE,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+INSERT INTO automatizaciones (name, type, days_offset, status) VALUES
+  ('Cumpleaños', 'cumpleaños', 0, 'activa'),
+  ('5 días antes vencimiento', 'vencimiento', -5, 'activa'),
+  ('3 días antes vencimiento', 'vencimiento', -3, 'activa'),
+  ('1 día antes vencimiento', 'vencimiento', -1, 'activa'),
+  ('Seguimiento 3 meses', 'seguimiento_3m', 90, 'activa'),
+  ('Seguimiento 6 meses', 'seguimiento_6m', 180, 'activa'),
+  ('Seguimiento anual', 'seguimiento_anual', 365, 'activa'),
+  ('Aniversario de compra', 'aniversario', 365, 'activa')
+ON CONFLICT DO NOTHING;
+
+-- Cargar cotizaciones iniciales
+INSERT INTO cotizacion_models (model_name, line) VALUES
+  ('iPhone 11', 'base'), ('iPhone 11 Pro', 'pro'), ('iPhone 11 Pro Max', 'pro_max'),
+  ('iPhone 12', 'base'), ('iPhone 12 Pro', 'pro'), ('iPhone 12 Pro Max', 'pro_max'),
+  ('iPhone 13', 'base'), ('iPhone 13 Pro', 'pro'), ('iPhone 13 Pro Max', 'pro_max'),
+  ('iPhone 14', 'base'), ('iPhone 14 Pro', 'pro'), ('iPhone 14 Pro Max', 'pro_max'),
+  ('iPhone 15', 'base'), ('iPhone 15 Pro', 'pro'), ('iPhone 15 Pro Max', 'pro_max'),
+  ('iPhone 16', 'base'), ('iPhone 16 Pro', 'pro'), ('iPhone 16 Pro Max', 'pro_max'),
+  ('iPhone 17', 'base'), ('iPhone 17 Pro', 'pro')
+ON CONFLICT DO NOTHING;
+
+-- Triggers nuevas tablas
+DROP TRIGGER IF EXISTS clients_updated_at ON clients;
+CREATE TRIGGER clients_updated_at BEFORE UPDATE ON clients FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS productos_updated_at ON productos;
+CREATE TRIGGER productos_updated_at BEFORE UPDATE ON productos FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS tasks_updated_at ON tasks;
+CREATE TRIGGER tasks_updated_at BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS supplier_orders_updated_at ON supplier_orders;
+CREATE TRIGGER supplier_orders_updated_at BEFORE UPDATE ON supplier_orders FOR EACH ROW EXECUTE FUNCTION update_updated_at();
