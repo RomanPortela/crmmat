@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS contacts (
   id          SERIAL PRIMARY KEY,
   name        VARCHAR(200),
-  phone       VARCHAR(30) UNIQUE NOT NULL,
+  phone       VARCHAR(30),
   whatsapp_id VARCHAR(100),
   city        VARCHAR(100) DEFAULT 'Bahía Blanca',
   source      VARCHAR(50) DEFAULT 'whatsapp', -- whatsapp, instagram, referido, local
