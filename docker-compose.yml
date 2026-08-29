@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: altech_crm
+      POSTGRES_USER: altech
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-altech2025}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U altech -d altech_crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: postgresql://altech:${DB_PASSWORD:-altech2025}@db:5432/altech_crm
+      SESSION_SECRET: ${SESSION_SECRET:-altech_crm_secret_2025}
+      WEBHOOK_API_KEY: ${WEBHOOK_API_KEY:-altech_n8n_key_2025}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-mati@altech.com.ar}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-altech2025}
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

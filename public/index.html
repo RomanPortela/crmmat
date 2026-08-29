@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Altech CRM</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen" class="login-screen hidden">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-mark">A</div>
+      <div>
+        <h1>Altech CRM</h1>
+        <p>Gestión de ventas</p>
+      </div>
+    </div>
+    <form id="login-form">
+      <div class="field"><label>Email</label><input type="email" id="email" placeholder="tu@email.com" required /></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="password" placeholder="••••••••" required /></div>
+      <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
+      <p id="login-error" class="error-msg hidden"></p>
+    </form>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" class="app hidden">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">A</div>
+      <span>Altech</span>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="#" data-view="dashboard" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg>Dashboard</a></li>
+      <li><a href="#" data-view="pipeline" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>Pipeline</a></li>
+      <li><a href="#" data-view="contacts" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Contactos</a></li>
+      <li><a href="#" data-view="appointments" class="nav-item"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Turnos</a></li>
+      <li><a href="#" data-view="sales" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Ventas</a></li>
+      <li><a href="#" data-view="productos" class="nav-item"><svg viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z"/></svg>Productos</a></li>
+      <li><a href="#" data-view="clientes" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Clientes</a></li>
+      <li><a href="#" data-view="cobros" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>Cobros</a></li>
+      <li><a href="#" data-view="caja" class="nav-item"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Caja</a></li>
+      <li><a href="#" data-view="calendario" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>Calendario</a></li>
+      <li><a href="#" data-view="tareas" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>Tareas</a></li>
+      <li><a href="#" data-view="proveedores" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Proveedores</a></li>
+      <li><a href="#" data-view="cotizaciones" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Cotizaciones</a></li>
+      <li><a href="#" data-view="automatizaciones" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>Automatizaciones</a></li>
+      <li><a href="#" data-view="plantillas" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>Plantillas IA</a></li>
+      <li><a href="#" data-view="reports" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/><path d="M5 9h4v10H5zm6-4h4v14h-4zm6 8h2v6h-2z"/></svg>Reportes</a></li>
+      <li><a href="#" data-view="settings" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>Configuración</a></li>
+    </ul>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar">M</div>
+      <div class="user-info">
+        <span id="user-name">—</span>
+        <button id="logout-btn" class="btn-link">Salir</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <div class="page-header">
+        <div><h2>Dashboard</h2><span id="dashboard-date" class="text-muted"></span></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card accent"><div class="kpi-label">Leads hoy</div><div class="kpi-value" id="kpi-leads">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Turnos hoy</div><div class="kpi-value" id="kpi-turnos">—</div></div>
+        <div class="kpi-card green"><div class="kpi-label">Ventas semana</div><div class="kpi-value" id="kpi-ventas">—</div><div class="kpi-sub" id="kpi-ventas-usd"></div></div>
+        <div class="kpi-card"><div class="kpi-label">Conversión 30d</div><div class="kpi-value" id="kpi-conv">—</div></div>
+      </div>
+      <div id="dashboard-extra-kpis" class="kpi-grid"></div>
+      <div class="dashboard-grid">
+        <div class="card"><h3 class="card-title">Pipeline activo</h3><div id="pipeline-summary"></div></div>
+        <div class="card"><h3 class="card-title">Próximos turnos</h3><div id="turnos-proximos"></div></div>
+      </div>
+      <div class="dashboard-grid mt-4">
+        <div class="card"><h3 class="card-title">Caja — Capital y ganancias</h3><div id="dashboard-caja"></div></div>
+        <div class="card"><h3 class="card-title">Próximos cumpleaños</h3><div id="dashboard-cumples"></div></div>
+      </div>
+      <div class="card mt-4"><h3 class="card-title">Últimas ventas</h3><div id="ventas-recientes"></div></div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section id="view-pipeline" class="view hidden">
+      <div class="page-header">
+        <div><h2>Pipeline</h2></div>
+        <div class="header-actions">
+          <input type="search" id="pipeline-search" placeholder="Buscar lead..." class="search-input" />
+          <button class="btn btn-primary" onclick="openModal('modal-new-lead')">+ Nuevo lead</button>
+        </div>
+      </div>
+      <div id="pipeline-source-stats" class="source-stats-bar"></div>
+      <div id="kanban-board" class="kanban-board"></div>
+    </section>
+
+    <!-- CONTACTOS -->
+    <section id="view-contacts" class="view hidden">
+      <div class="page-header">
+        <div><h2>Contactos</h2></div>
+        <div class="header-actions">
+          <select id="contacts-stage-filter" class="select-input"><option value="">Todas las etapas</option></select>
+          <input type="search" id="contacts-search" placeholder="Nombre o teléfono..." class="search-input" />
+          <button class="btn btn-primary" onclick="openModal('modal-new-lead')">+ Nuevo</button>
+        </div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Nombre</th><th>Teléfono</th><th>Ciudad</th><th>Etapa</th><th>Interés</th><th>Último contacto</th><th></th></tr></thead>
+          <tbody id="contacts-table-body"></tbody>
+        </table>
+        <div id="contacts-pagination" class="pagination"></div>
+      </div>
+    </section>
+
+    <!-- TURNOS -->
+    <section id="view-appointments" class="view hidden">
+      <div class="page-header">
+        <div><h2>Turnos</h2></div>
+        <div class="header-actions">
+          <input type="date" id="apt-filter-date" class="select-input" />
+          <select id="apt-filter-status" class="select-input">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="confirmado">Confirmados</option>
+            <option value="completado">Completados</option>
+            <option value="cancelado">Cancelados</option>
+            <option value="no_vino">No vino</option>
+          </select>
+          <button class="btn btn-primary" onclick="openNewAppointment()">+ Nuevo turno</button>
+        </div>
+      </div>
+      <div id="appointments-list" class="appointments-list"></div>
+    </section>
+
+    <!-- VENTAS -->
+    <section id="view-sales" class="view hidden">
+      <div class="page-header">
+        <div><h2>Ventas</h2></div>
+        <div class="header-actions">
+          <input type="month" id="sales-filter-month" class="select-input" />
+          <button class="btn btn-primary" onclick="openModal('modal-new-sale')">+ Registrar venta</button>
+        </div>
+      </div>
+      <div class="stats-row" id="sales-stats"></div>
+      <div class="card mt-4">
+        <table class="data-table">
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Precio USD</th><th>Pago</th><th>Canje</th><th></th></tr></thead>
+          <tbody id="sales-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- REPORTES -->
+    <section id="view-reports" class="view hidden">
+      <div class="page-header">
+        <div><h2>Reportes</h2></div>
+        <div class="header-actions">
+          <select id="reports-period" class="select-input">
+            <option value="7">Últimos 7 días</option>
+            <option value="30" selected>Últimos 30 días</option>
+            <option value="90">Últimos 90 días</option>
+          </select>
+          <button class="btn btn-ghost" onclick="exportCSV('contacts')">↓ Contactos CSV</button>
+          <button class="btn btn-ghost" onclick="exportCSV('sales')">↓ Ventas</button>
+          <button class="btn btn-ghost" onclick="exportCSV('productos')">↓ Productos</button>
+          <button class="btn btn-ghost" onclick="exportCSV('caja')">↓ Caja</button>
+        </div>
+      </div>
+      <div id="reports-kpis" class="kpi-grid"></div>
+      <div class="dashboard-grid mt-4">
+        <div class="card" style="grid-column:1/-1">
+          <h3 class="card-title">Ventas diarias (USD)</h3>
+          <canvas id="chart-ventas" height="80"></canvas>
+        </div>
+      </div>
+      <div class="dashboard-grid mt-4">
+        <div class="card">
+          <h3 class="card-title">Pipeline — Distribución</h3>
+          <canvas id="chart-funnel" height="160"></canvas>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Métodos de pago</h3>
+          <canvas id="chart-pagos" height="160"></canvas>
+        </div>
+      </div>
+      <div class="dashboard-grid mt-4">
+        <div class="card">
+          <h3 class="card-title">Facturación y ganancia por mes</h3>
+          <canvas id="chart-mensual" height="160"></canvas>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Stock por estado</h3>
+          <canvas id="chart-stock" height="160"></canvas>
+        </div>
+      </div>
+      <div class="dashboard-grid mt-4">
+        <div class="card">
+          <h3 class="card-title">Modelos más vendidos</h3>
+          <div id="modelos-top-list"></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Ventas por vendedor</h3>
+          <div id="vendedores-list"></div>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <h3 class="card-title">Compras por proveedor</h3>
+        <div id="proveedores-report-list"></div>
+      </div>
+    </section>
+
+    <!-- CONFIGURACIÓN -->
+    <section id="view-settings" class="view hidden">
+      <div class="page-header">
+        <div><h2>Configuración</h2></div>
+        <div class="header-actions" id="settings-admin-btn"></div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3 class="card-title">Datos de la empresa</h3>
+          <form id="form-company-config" style="display:flex;flex-direction:column;gap:.65rem;margin-top:.5rem">
+            <div class="field"><label>Nombre</label><input type="text" name="company_name" /></div>
+            <div class="field"><label>Teléfono</label><input type="text" name="company_phone" /></div>
+            <div class="field"><label>Dirección</label><input type="text" name="company_address" /></div>
+            <div class="field"><label>Cotización dólar</label><input type="number" name="cotizacion_dolar" /></div>
+            <label style="display:flex;align-items:center;gap:.6rem;font-size:13px;cursor:pointer">
+              <input type="checkbox" id="ai-global-toggle" style="width:auto" /> IA activa globalmente
+            </label>
+            <button type="submit" class="btn btn-primary">Guardar configuración</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Cambiar contraseña</h3>
+          <form id="form-change-password" style="display:flex;flex-direction:column;gap:.65rem;margin-top:.5rem">
+            <div class="field"><label>Contraseña actual</label><input type="password" name="current" required /></div>
+            <div class="field"><label>Nueva contraseña</label><input type="password" name="newPassword" required /></div>
+            <div class="field"><label>Confirmar nueva</label><input type="password" name="confirm" required /></div>
+            <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+          </form>
+        </div>
+      </div>
+      <div class="dashboard-grid mt-4">
+        <div class="card" id="users-panel" style="grid-column:1/-1">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+            <h3 class="card-title" style="margin-bottom:0">Usuarios del CRM</h3>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-new-user')">+ Agregar</button>
+          </div>
+          <div id="users-list"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- PRODUCTOS -->
+    <section id="view-productos" class="view hidden">
+      <div class="page-header">
+        <div><h2>Productos / Stock</h2></div>
+        <div class="header-actions">
+          <input type="search" id="prod-search" placeholder="Modelo, IMEI, color..." class="search-input" />
+          <select id="prod-filter-status" class="select-input">
+            <option value="">Todos</option>
+            <option value="en_stock">En stock</option>
+            <option value="señado">Señados</option>
+            <option value="vendido">Vendidos</option>
+          </select>
+          <button class="btn btn-ghost" onclick="openModal('modal-import-stock')">↕ Excel</button>
+          <button class="btn btn-primary" onclick="openModal('modal-new-producto')">+ Producto</button>
+        </div>
+      </div>
+      <div class="stats-row" id="productos-stats"></div>
+      <div class="card mt-4">
+        <table class="data-table">
+          <thead><tr><th>Modelo</th><th>GB</th><th>Color</th><th>Batería</th><th>Estado</th><th>Precio</th><th>Costo</th><th>Ganancia</th><th></th></tr></thead>
+          <tbody id="productos-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section id="view-clientes" class="view hidden">
+      <div class="page-header">
+        <div><h2>Clientes</h2></div>
+        <div class="header-actions">
+          <input type="search" id="cli-search" placeholder="Nombre, DNI, teléfono..." class="search-input" />
+          <button class="btn btn-ghost" onclick="window.open('/api/clients/export/csv','_blank')">↓ CSV</button>
+          <button class="btn btn-primary" onclick="openModal('modal-new-cliente')">+ Cliente</button>
+        </div>
+      </div>
+      <div class="stats-row" id="clientes-stats"></div>
+      <div class="card mt-4">
+        <table class="data-table">
+          <thead><tr><th>Nombre</th><th>DNI</th><th>Teléfono</th><th>Localidad</th><th>Compras</th><th>Facturado</th><th>Cumpleaños</th><th></th></tr></thead>
+          <tbody id="clientes-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- COBROS -->
+    <section id="view-cobros" class="view hidden">
+      <div class="page-header">
+        <div><h2>Cobros y Señas</h2></div>
+        <div class="header-actions">
+          <input type="search" id="cobros-search" placeholder="Cliente o producto..." class="search-input" />
+          <select id="cobros-filter-type" class="select-input">
+            <option value="">Todos</option>
+            <option value="seña">Señas</option>
+            <option value="cobro_total">Cobros totales</option>
+            <option value="cobro_parcial">Cobros parciales</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('modal-new-cobro')">+ Registrar cobro</button>
+        </div>
+      </div>
+      <div class="stats-row" id="cobros-stats"></div>
+      <div class="card mt-4">
+        <table class="data-table">
+          <thead><tr><th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Tipo</th><th>Importe</th><th>Medios</th><th></th></tr></thead>
+          <tbody id="cobros-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CAJA -->
+    <section id="view-caja" class="view hidden">
+      <div class="page-header">
+        <div><h2>Caja</h2></div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-cajatab="dia" onclick="switchCajaTab('dia')">Caja del día</button>
+        <button class="tab" data-cajatab="capital" onclick="switchCajaTab('capital')">Capital y ganancias</button>
+        <button class="tab" data-cajatab="cierres" onclick="switchCajaTab('cierres')">Cierres</button>
+      </div>
+
+      <!-- TAB: Caja del día -->
+      <div id="caja-tab-dia" class="caja-tab">
+        <div class="page-header" style="margin-bottom:1rem">
+          <div>
+            <span class="text-muted" id="caja-dia-fecha"></span>
+          </div>
+          <div class="header-actions">
+            <input type="date" id="caja-dia-picker" class="select-input" />
+            <button class="btn btn-primary" onclick="cerrarCaja()">🔒 Cerrar caja</button>
+          </div>
+        </div>
+        <div id="caja-dia-totales" class="kpi-grid"></div>
+        <div class="dashboard-grid mt-4">
+          <div class="card">
+            <h3 class="card-title">Desglose por medio de pago</h3>
+            <div id="caja-dia-desglose"></div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Movimientos del día</h3>
+            <div id="caja-dia-movimientos" style="max-height:420px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Capital y ganancias -->
+      <div id="caja-tab-capital" class="caja-tab hidden">
+        <div class="header-actions" style="margin-bottom:1rem">
+          <select id="caja-filter" class="select-input">
+            <option value="">Todas</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="cerrado">Cerradas</option>
+          </select>
+        </div>
+        <div id="caja-resumen" class="kpi-grid"></div>
+        <div class="card mt-4">
+          <h3 class="card-title">Operaciones</h3>
+          <table class="data-table">
+            <thead><tr><th>Fecha</th><th>Producto</th><th>Cliente</th><th>Precio</th><th>Costo</th><th>Ganancia</th><th>Capital reint.</th><th>Ganancia ret.</th></tr></thead>
+            <tbody id="caja-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: Cierres -->
+      <div id="caja-tab-cierres" class="caja-tab hidden">
+        <div class="card">
+          <h3 class="card-title">Registro de cierres</h3>
+          <table class="data-table">
+            <thead><tr><th>Fecha</th><th>Cobros</th><th>Ventas</th><th>Total pesos</th><th>Total USD</th><th>Ganancia USD</th><th>Cerró</th><th></th></tr></thead>
+            <tbody id="caja-cierres-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDARIO -->
+    <section id="view-calendario" class="view hidden">
+      <div class="page-header">
+        <div><h2>Calendario</h2></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost btn-sm" onclick="changeMonth(-1)">‹</button>
+          <span id="cal-month-label" style="min-width:140px;text-align:center;font-weight:600"></span>
+          <button class="btn btn-ghost btn-sm" onclick="changeMonth(1)">›</button>
+          <button class="btn btn-primary" onclick="openNewEvento()">+ Evento</button>
+        </div>
+      </div>
+      <div class="card"><div id="calendar-grid" class="calendar-grid"></div></div>
+    </section>
+
+    <!-- TAREAS -->
+    <section id="view-tareas" class="view hidden">
+      <div class="page-header">
+        <div><h2>Tareas</h2></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" onclick="generarTareasAuto()">⚙ Generar automáticas</button>
+          <button class="btn btn-primary" onclick="openModal('modal-new-tarea')">+ Tarea</button>
+        </div>
+      </div>
+      <div id="tareas-kanban" class="kanban-board"></div>
+    </section>
+
+    <!-- PROVEEDORES -->
+    <section id="view-proveedores" class="view hidden">
+      <div class="page-header">
+        <div><h2>Proveedores y Pedidos</h2></div>
+        <div class="header-actions">
+          <input type="search" id="prov-search" placeholder="Buscar..." class="search-input" />
+          <button class="btn btn-primary" id="prov-add-btn" onclick="openModal('modal-new-proveedor')">+ Proveedor</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="proveedores" onclick="switchProvTab('proveedores')">Proveedores</button>
+        <button class="tab" data-tab="pedidos" onclick="switchProvTab('pedidos')">Pedidos <span class="tab-badge" id="tab-badge-pedidos"></span></button>
+        <button class="tab" data-tab="alertas" onclick="switchProvTab('alertas')">Alertas <span class="tab-badge" id="tab-badge-alertas"></span></button>
+      </div>
+
+      <div id="prov-tab-proveedores" class="prov-tab">
+        <div id="proveedores-list" class="appointments-list"></div>
+      </div>
+
+      <div id="prov-tab-pedidos" class="prov-tab hidden">
+        <div class="stats-row" id="pedidos-stats"></div>
+        <div class="header-actions" style="margin:1rem 0">
+          <select id="pedidos-filter-status" class="select-input">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="en_camino">En camino</option>
+            <option value="llegado">Llegados</option>
+            <option value="cancelado">Cancelados</option>
+          </select>
+          <button class="btn btn-primary" onclick="openNewPedido()">+ Nuevo pedido</button>
+        </div>
+        <div id="pedidos-list" class="appointments-list"></div>
+      </div>
+
+      <div id="prov-tab-alertas" class="prov-tab hidden">
+        <div class="dashboard-grid">
+          <div class="card" style="grid-column:1/-1">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+              <h3 class="card-title" style="margin-bottom:0">Alertas activas</h3>
+              <button class="btn btn-ghost btn-sm" onclick="loadAlertas()">↻ Actualizar</button>
+            </div>
+            <div id="alertas-activas"></div>
+          </div>
+        </div>
+        <div class="card mt-4">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+            <h3 class="card-title" style="margin-bottom:0">Configuración de alertas</h3>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-new-alerta')">+ Nueva alerta</button>
+          </div>
+          <div id="alertas-config"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COTIZACIONES -->
+    <section id="view-cotizaciones" class="view hidden">
+      <div class="page-header">
+        <div><h2>Cotizaciones — Tabla de permuta</h2></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" onclick="verChecklist()">📋 Checklist de revisión</button>
+          <button class="btn btn-ghost" onclick="resetCotizaciones()">↻ Recargar tabla oficial</button>
+          <button class="btn btn-primary" onclick="openModal('modal-calc-cotizacion')">Cotizar equipo</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-ctab="tabla" onclick="switchCotizTab('tabla')">Tabla de precios</button>
+        <button class="tab" data-ctab="descuentos" onclick="switchCotizTab('descuentos')">Descuentos por daño</button>
+        <button class="tab" data-ctab="modificadores" onclick="switchCotizTab('modificadores')">Modificadores</button>
+      </div>
+
+      <!-- TAB: Tabla de precios -->
+      <div id="cotiz-tab-tabla" class="cotiz-tab">
+        <div class="cotiz-layout">
+          <div class="card cotiz-sidebar">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+              <h3 class="card-title" style="margin-bottom:0">Modelos</h3>
+              <button class="btn btn-primary btn-xs" onclick="openModal('modal-new-modelo')">+</button>
+            </div>
+            <input type="search" id="cotiz-model-search" placeholder="Buscar modelo..." style="margin-bottom:.6rem" />
+            <div id="cotiz-modelos-list"></div>
+          </div>
+
+          <div class="card cotiz-main">
+            <div id="cotiz-detail-empty" style="text-align:center;padding:3rem 1rem;color:var(--text-muted)">
+              Seleccioná un modelo de la lista para ver y editar sus rangos de precio
+            </div>
+            <div id="cotiz-detail-content" class="hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+                <div>
+                  <h3 id="cotiz-detail-title" style="font-size:1rem;font-weight:700"></h3>
+                  <span id="cotiz-detail-sub" class="text-muted"></span>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="addEntryRow()">+ Agregar rango</button>
+              </div>
+
+              <table class="data-table cotiz-table">
+                <thead>
+                  <tr>
+                    <th style="width:90px">Capacidad</th>
+                    <th style="width:150px">Rango de batería</th>
+                    <th style="width:110px">Precio USD</th>
+                    <th>Nota</th>
+                    <th style="width:90px"></th>
+                  </tr>
+                </thead>
+                <tbody id="cotiz-entries-body"></tbody>
+              </table>
+
+              <div id="cotiz-mods-info" style="margin-top:1rem"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Descuentos -->
+      <div id="cotiz-tab-descuentos" class="cotiz-tab hidden">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <div>
+              <h3 class="card-title" style="margin-bottom:2px">Costos de reparación</h3>
+              <span class="text-muted">Se descuentan del valor de toma. Editá el monto directamente en la tabla.</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addDescuentoRow()">+ Agregar descuento</button>
+          </div>
+          <table class="data-table cotiz-table">
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th style="width:120px">Monto USD</th>
+                <th style="width:140px">Aplica a</th>
+                <th>Nota</th>
+                <th style="width:80px">Activo</th>
+                <th style="width:90px"></th>
+              </tr>
+            </thead>
+            <tbody id="cotiz-descuentos-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: Modificadores -->
+      <div id="cotiz-tab-modificadores" class="cotiz-tab hidden">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <div>
+              <h3 class="card-title" style="margin-bottom:2px">Modificadores de precio</h3>
+              <span class="text-muted">Ajustes automáticos por capacidad o línea (ej: +$50 si es 256GB)</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addModificadorRow()">+ Agregar modificador</button>
+          </div>
+          <table class="data-table cotiz-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th style="width:110px">Tipo</th>
+                <th style="width:110px">Condición</th>
+                <th style="width:110px">Monto USD</th>
+                <th style="width:150px">Modelo</th>
+                <th style="width:80px">Activo</th>
+                <th style="width:90px"></th>
+              </tr>
+            </thead>
+            <tbody id="cotiz-modificadores-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTOMATIZACIONES -->
+    <section id="view-automatizaciones" class="view hidden">
+      <div class="page-header">
+        <div><h2>Automatizaciones</h2></div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openModal('modal-new-automatizacion')">+ Automatización</button>
+        </div>
+      </div>
+      <div id="automatizaciones-list" class="appointments-list"></div>
+    </section>
+
+
+    <!-- PLANTILLAS IA -->
+    <section id="view-plantillas" class="view hidden">
+      <div class="page-header">
+        <div>
+          <h2>Plantillas del agente IA</h2>
+          <span class="text-muted">Mensajes que usa el asistente de WhatsApp. Editalos y guardá los cambios.</span>
+        </div>
+        <div class="header-actions">
+          <input type="search" id="tpl-search" placeholder="Buscar mensaje..." class="search-input" />
+          <select id="tpl-section-filter" class="select-input"><option value="">Todas las secciones</option></select>
+        </div>
+      </div>
+      <div id="plantillas-container"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ════ MODALS ════════════════════════════════ -->
+
+<!-- Nuevo lead -->
+<div id="modal-new-lead" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-lead')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Nuevo lead</h3><button class="modal-close" onclick="closeModal('modal-new-lead')">✕</button></div>
+    <form id="form-new-lead" class="modal-form">
+      <div class="form-grid">
+        <div class="field"><label>Nombre</label><input type="text" name="name" placeholder="Nombre del cliente" /></div>
+        <div class="field"><label>Teléfono</label><input type="text" name="phone" placeholder="+549291... (opcional)" /></div>
+        <div class="field"><label>Usuario de Instagram</label><input type="text" name="instagram" placeholder="@usuario (opcional)" /></div>
+        <div class="field"><label>Equipo que busca</label><input type="text" name="product_interest" placeholder="iPhone 15 Pro..." /></div>
+        <div class="field"><label>Fuente</label><select name="source"><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="referido">Referido</option><option value="local">Local</option></select></div>
+        <div class="field"><label>Primer iPhone</label><select name="is_first_iphone"><option value="">No sé</option><option value="true">Sí</option><option value="false">No</option></select></div>
+        <div class="field"><label>iPhone actual</label><input type="text" name="current_device" placeholder="iPhone 13..." /></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="agent_notes" rows="2" placeholder="Observaciones..."></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-lead')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Cambiar etapa -->
+<div id="modal-stage" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-stage')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Mover etapa</h3><button class="modal-close" onclick="closeModal('modal-stage')">✕</button></div>
+    <div class="modal-form">
+      <p class="text-muted" id="stage-contact-name" style="margin-bottom:1rem"></p>
+      <div id="stage-buttons" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+      <div id="stage-lost-reason" class="field hidden" style="margin-top:0.75rem">
+        <label>Motivo de pérdida</label>
+        <input type="text" id="lost-reason-input" placeholder="¿Por qué no compró?" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-stage')">Cancelar</button>
+        <button class="btn btn-primary" id="stage-confirm-btn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Nuevo turno -->
+<div id="modal-new-appointment" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-appointment')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="apt-modal-title">Nuevo turno</h3><button class="modal-close" onclick="closeModal('modal-new-appointment')">✕</button></div>
+    <form id="form-new-appointment" class="modal-form">
+      <input type="hidden" name="id" />
+      <input type="hidden" name="contact_id" id="apt-contact-id" />
+      <input type="hidden" name="conversation_id" id="apt-conversation-id" />
+
+      <div class="field">
+        <label>Contacto *</label>
+        <div style="position:relative">
+          <input type="text" id="apt-contact-search" placeholder="Buscar por nombre o teléfono..." autocomplete="off" />
+          <div id="apt-contact-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="apt-contact-selected" class="selected-chip hidden"></div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field"><label>Fecha y hora *</label><input type="datetime-local" name="scheduled_at" required /></div>
+      </div>
+
+      <div class="field">
+        <label>Equipo de interés</label>
+        <div style="position:relative">
+          <input type="text" id="apt-producto-search" placeholder="Buscar modelo, color..." autocomplete="off" />
+          <input type="hidden" name="producto_id" id="apt-producto-id" />
+          <div id="apt-producto-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="apt-producto-selected" class="selected-chip hidden"></div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>¿Dejó seña?</label>
+          <select name="sena_paid" id="apt-sena-select">
+            <option value="false">No</option>
+            <option value="true">Sí</option>
+          </select>
+        </div>
+        <div class="field hidden" id="apt-sena-amount-field">
+          <label>Monto de seña (pesos)</label>
+          <input type="number" name="sena_amount" placeholder="30000" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Tiene canje?</label>
+        <select name="has_trade_in" id="apt-canje-select">
+          <option value="false">No</option>
+          <option value="true">Sí</option>
+        </select>
+      </div>
+
+      <div class="hidden" id="apt-canje-fields">
+        <div class="form-grid">
+          <div class="field"><label>Modelo a entregar</label><input type="text" id="apt-ti-model" placeholder="iPhone 13 Pro" /></div>
+          <div class="field"><label>Capacidad GB</label><input type="number" id="apt-ti-gb" placeholder="128" /></div>
+          <div class="field"><label>Batería %</label><input type="number" id="apt-ti-battery" placeholder="90" min="0" max="100" /></div>
+          <div class="field"><label>Valor de toma (USD)</label><input type="number" id="apt-ti-value" placeholder="300" step="0.01" /></div>
+        </div>
+        <div class="field"><label>Detalles del equipo</label><textarea id="apt-ti-notes" rows="2" placeholder="Pantalla rota, tapa trasera, Face ID..."></textarea></div>
+      </div>
+
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2" placeholder="Observaciones del turno..."></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-appointment')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Agendar turno</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Registrar venta -->
+<div id="modal-new-sale" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-sale')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Registrar venta</h3><button class="modal-close" onclick="closeModal('modal-new-sale')">✕</button></div>
+    <form id="form-new-sale" class="modal-form">
+      <input type="hidden" name="contact_id" id="sale-contact-id" />
+      <input type="hidden" name="producto_id" id="sale-producto-id" />
+
+      <div class="field">
+        <label>Cliente *</label>
+        <div style="position:relative">
+          <input type="text" id="sale-contact-search" placeholder="Buscar por nombre o teléfono..." autocomplete="off" />
+          <div id="sale-contact-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="sale-contact-selected" class="selected-chip hidden"></div>
+      </div>
+
+      <div class="field">
+        <label>Producto *</label>
+        <div style="position:relative">
+          <input type="text" id="sale-producto-search" placeholder="Buscar modelo en stock..." autocomplete="off" />
+          <div id="sale-producto-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="sale-producto-selected" class="selected-chip hidden"></div>
+        <span style="font-size:11px;color:var(--text-muted)">Al elegir el producto se completa el precio automáticamente. Se marcará como vendido en stock.</span>
+      </div>
+
+      <div class="form-grid">
+        <input type="hidden" name="product_name" id="sale-product-name" />
+        <div class="field"><label>Precio USD *</label><input type="number" name="price_usd" id="sale-price-usd" placeholder="650" step="0.01" required /></div>
+        <div class="field"><label>Cotización del día</label><input type="number" name="cotizacion" placeholder="1540" /></div>
+        <div class="field"><label>Forma de pago</label>
+          <select name="payment_method" id="sale-payment-method">
+            <option value="efectivo_pesos">Efectivo pesos</option>
+            <option value="efectivo_usd">Efectivo USD</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="tarjeta">Tarjeta de crédito</option>
+            <option value="credito_personal">Crédito personal DNI</option>
+          </select>
+        </div>
+        <div class="field" id="sale-cuotas-field" style="display:none"><label>Cuotas</label><select name="cuotas"><option value="1">1 cuota (+12%)</option><option value="3">3 cuotas (+35%)</option><option value="6">6 cuotas (+50%)</option></select></div>
+        <div class="field"><label>Valor canje (USD)</label><input type="number" name="trade_in_value" placeholder="0" value="0" step="0.01" /></div>
+        <div class="field"><label>¿Con cargador? (+$30.000)</label><select name="accessories"><option value="false">No</option><option value="true">Sí</option></select></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2" placeholder="Observaciones..."></textarea></div>
+      <div id="sale-total-preview" class="sale-preview hidden"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-sale')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Registrar venta</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Detalle contacto -->
+<div id="modal-contact" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-contact')"></div>
+  <div class="modal-box modal-box-lg">
+    <div class="modal-header">
+      <h3 id="modal-contact-title">—</h3>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <button class="btn btn-ghost btn-sm" id="modal-contact-wa">WhatsApp ↗</button>
+        <button class="modal-close" onclick="closeModal('modal-contact')">✕</button>
+      </div>
+    </div>
+    <div id="modal-contact-body"></div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Modal nuevo usuario -->
+<div id="modal-new-user" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-user')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Nuevo usuario</h3><button class="modal-close" onclick="closeModal('modal-new-user')">✕</button></div>
+    <form id="form-new-user" class="modal-form">
+      <div class="field"><label>Nombre</label><input type="text" name="name" required /></div>
+      <div class="field"><label>Email</label><input type="email" name="email" required /></div>
+      <div class="field"><label>Contraseña</label><input type="password" name="password" required /></div>
+      <div class="field"><label>Rol</label><select name="role"><option value="agent">Agente</option><option value="admin">Admin</option></select></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-user')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear usuario</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal agregar nota -->
+<div id="modal-add-note" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-add-note')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Agregar nota</h3><button class="modal-close" onclick="closeModal('modal-add-note')">✕</button></div>
+    <div class="modal-form">
+      <div class="field"><label>Nota</label><textarea id="note-text" rows="4" placeholder="Escribí la nota..."></textarea></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-note')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitNote()">Guardar nota</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nuevo producto -->
+<div id="modal-new-producto" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-producto')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Nuevo producto</h3><button class="modal-close" onclick="closeModal('modal-new-producto')">✕</button></div>
+    <form id="form-new-producto" class="modal-form">
+      <div class="form-grid">
+        <div class="field"><label>Modelo *</label><input type="text" name="model" placeholder="iPhone 15 Pro" required /></div>
+        <div class="field"><label>Color</label><input type="text" name="color" placeholder="Natural Titanium" /></div>
+        <div class="field"><label>Capacidad GB</label><input type="number" name="storage_gb" placeholder="128" /></div>
+        <div class="field"><label>Batería %</label><input type="number" name="battery_pct" placeholder="100" min="0" max="100" /></div>
+        <div class="field"><label>Tipo de batería</label>
+          <select name="battery_type" id="new-prod-battery-type">
+            <option value="original">Original</option>
+            <option value="reemplazada">Cambiada por nosotros</option>
+          </select>
+        </div>
+        <div class="field"><label>IMEI</label><input type="text" name="imei" /></div>
+        <div class="field"><label>N° Serie</label><input type="text" name="serial_number" /></div>
+        <div class="field"><label>Precio venta USD *</label><input type="number" name="price" step="0.01" required /></div>
+        <div class="field"><label>Costo USD *</label><input type="number" name="cost" step="0.01" required /></div>
+        <div class="field"><label>Face ID</label><select name="has_face_id"><option value="true">Funciona</option><option value="false">No funciona</option></select></div>
+        <div class="field"><label>True Tone</label><select name="has_true_tone"><option value="true">Sí</option><option value="false">No</option></select></div>
+        <div class="field"><label>Caja original</label><select name="has_original_box"><option value="false">No</option><option value="true">Sí</option></select></div>
+        <div class="field"><label>Garantía (meses)</label><input type="number" name="warranty_months" id="new-prod-warranty" value="3" />
+          <span style="font-size:11px;color:var(--text-muted)">Se autocompleta según el tipo de batería — se puede modificar</span>
+        </div>
+      </div>
+      <div class="field"><label>Notas de estado (pantalla rota, tapa, cámara...)</label><textarea name="condition_notes" rows="2"></textarea></div>
+      <div class="field"><label>Notas generales</label><textarea name="general_notes" rows="2"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-producto')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar producto</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal nuevo cliente -->
+<div id="modal-new-cliente" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-cliente')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Nuevo cliente</h3><button class="modal-close" onclick="closeModal('modal-new-cliente')">✕</button></div>
+    <form id="form-new-cliente" class="modal-form">
+      <div class="form-grid">
+        <div class="field"><label>Nombre *</label><input type="text" name="name" required /></div>
+        <div class="field"><label>Apellido</label><input type="text" name="last_name" /></div>
+        <div class="field"><label>DNI</label><input type="text" name="dni" /></div>
+        <div class="field"><label>Teléfono</label><input type="text" name="phone" /></div>
+        <div class="field"><label>Email</label><input type="email" name="email" /></div>
+        <div class="field"><label>Instagram</label><input type="text" name="instagram" /></div>
+        <div class="field"><label>Dirección</label><input type="text" name="address" /></div>
+        <div class="field"><label>Localidad</label><input type="text" name="city" value="Bahía Blanca" /></div>
+        <div class="field"><label>Cumpleaños</label><input type="date" name="birthday" /></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-cliente')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar cliente</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal nuevo cobro -->
+<div id="modal-new-cobro" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-cobro')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Registrar cobro</h3><button class="modal-close" onclick="closeModal('modal-new-cobro')">✕</button></div>
+    <form id="form-new-cobro" class="modal-form">
+      <input type="hidden" name="client_id" id="cobro-client-id" />
+      <input type="hidden" name="producto_id" id="cobro-producto-id" />
+
+      <div class="field">
+        <label>Cliente *</label>
+        <div style="position:relative">
+          <input type="text" id="cobro-client-search" placeholder="Buscar por nombre, teléfono o DNI..." autocomplete="off" />
+          <div id="cobro-client-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="cobro-client-selected" class="selected-chip hidden"></div>
+      </div>
+
+      <div class="field">
+        <label>Producto</label>
+        <div style="position:relative">
+          <input type="text" id="cobro-producto-search" placeholder="Buscar modelo, color, IMEI..." autocomplete="off" />
+          <div id="cobro-producto-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="cobro-producto-selected" class="selected-chip hidden"></div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field"><label>Tipo *</label><select name="type" required><option value="seña">Seña</option><option value="cobro_total">Cobro total</option><option value="cobro_parcial">Cobro parcial</option></select></div>
+        <div class="field"><label>Moneda *</label>
+          <select name="currency" id="cobro-currency">
+            <option value="ARS">Pesos (ARS)</option>
+            <option value="USD">Dólares (USD)</option>
+          </select>
+        </div>
+        <div class="field"><label>Importe total *</label><input type="number" name="total_amount" id="cobro-amount" step="0.01" required /></div>
+        <div class="field" id="cobro-cotizacion-field"><label>Cotización</label><input type="number" name="cotizacion" id="cobro-cotizacion" placeholder="1540" step="0.01" /></div>
+      </div>
+
+      <div id="cobro-conversion-preview" class="sale-preview hidden"></div>
+
+      <div class="field">
+        <label>Medios de pago</label>
+        <div id="cobro-payments-list"></div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="addPaymentRow()" style="margin-top:.4rem">+ Agregar medio de pago</button>
+      </div>
+      <div class="field"><label>Observaciones</label><textarea name="notes" rows="2"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-cobro')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Registrar cobro</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal nueva tarea -->
+<div id="modal-new-tarea" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-tarea')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Nueva tarea</h3><button class="modal-close" onclick="closeModal('modal-new-tarea')">✕</button></div>
+    <form id="form-new-tarea" class="modal-form">
+      <div class="field"><label>Título *</label><input type="text" name="title" required /></div>
+      <div class="field"><label>Descripción</label><textarea name="description" rows="2"></textarea></div>
+      <div class="form-grid">
+        <div class="field"><label>Prioridad</label><select name="priority"><option value="normal">Normal</option><option value="alta">Alta</option><option value="baja">Baja</option></select></div>
+        <div class="field"><label>Vencimiento</label><input type="datetime-local" name="due_date" /></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-tarea')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear tarea</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal nuevo proveedor -->
+<div id="modal-new-proveedor" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-proveedor')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Nuevo proveedor</h3><button class="modal-close" onclick="closeModal('modal-new-proveedor')">✕</button></div>
+    <form id="form-new-proveedor" class="modal-form">
+      <div class="field"><label>Nombre *</label><input type="text" name="name" required /></div>
+      <div class="field"><label>Contacto</label><input type="text" name="contact" /></div>
+      <div class="form-grid">
+        <div class="field"><label>Teléfono</label><input type="text" name="phone" /></div>
+        <div class="field"><label>Email</label><input type="email" name="email" /></div>
+      </div>
+      <div class="field"><label>Categorías</label><input type="text" name="categories" placeholder="iPhones, accesorios..." /></div>
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-proveedor')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal nuevo/editar evento -->
+<div id="modal-new-evento" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-evento')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="evento-modal-title">Nuevo evento</h3><button class="modal-close" onclick="closeModal('modal-new-evento')">✕</button></div>
+    <form id="form-new-evento" class="modal-form">
+      <input type="hidden" name="id" />
+      <div class="field"><label>Título *</label><input type="text" name="title" placeholder="Visita de Roman — iPhone 15 Pro" required /></div>
+      <div class="form-grid">
+        <div class="field"><label>Fecha y hora *</label><input type="datetime-local" name="start_at" required /></div>
+        <div class="field"><label>Tipo</label>
+          <select name="type"><option value="visita">Visita</option><option value="entrega">Entrega</option><option value="seña">Seña</option><option value="otro">Otro</option></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Lead / Contacto</label>
+        <div style="position:relative">
+          <input type="text" id="evento-lead-search" placeholder="Buscar por nombre o teléfono..." autocomplete="off" />
+          <input type="hidden" name="contact_id" id="evento-contact-id" />
+          <div id="evento-lead-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="evento-lead-selected" class="selected-chip hidden"></div>
+      </div>
+
+      <div class="field">
+        <label>Productos asociados</label>
+        <div style="position:relative">
+          <input type="text" id="evento-producto-search" placeholder="Buscar modelo, color, IMEI..." autocomplete="off" />
+          <div id="evento-producto-results" class="autocomplete-results hidden"></div>
+        </div>
+        <div id="evento-productos-list" style="margin-top:.5rem"></div>
+        <span style="font-size:11px;color:var(--text-muted)">Marcá "Reservar" para que el producto pase a estado Señado</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="field"><label>Monto seña</label><input type="number" name="sena_amount" step="0.01" placeholder="30000" /></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-evento')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar evento</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal detalle evento -->
+<div id="modal-evento-detalle" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-evento-detalle')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="evento-detalle-title">Evento</h3><button class="modal-close" onclick="closeModal('modal-evento-detalle')">✕</button></div>
+    <div id="evento-detalle-body"></div>
+  </div>
+</div>
+
+<!-- Modal calcular cotización -->
+<div id="modal-calc-cotizacion" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-calc-cotizacion')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Cotizar equipo usado</h3><button class="modal-close" onclick="closeModal('modal-calc-cotizacion')">✕</button></div>
+    <div class="modal-form">
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1"><label>Modelo *</label><select id="calc-model"><option value="">Seleccionar...</option></select></div>
+        <div class="field"><label>Capacidad</label>
+          <select id="calc-storage">
+            <option value="64">64GB</option>
+            <option value="128" selected>128GB</option>
+            <option value="256">256GB</option>
+            <option value="512">512GB</option>
+            <option value="1024">1TB</option>
+          </select>
+        </div>
+        <div class="field"><label>Batería %</label><input type="number" id="calc-battery" value="100" min="0" max="100" /></div>
+      </div>
+      <div class="field">
+        <label>Daños detectados</label>
+        <div id="calc-discounts" class="calc-discounts-grid"></div>
+      </div>
+      <button class="btn btn-primary" onclick="calcularCotizacion()" style="width:100%">Calcular valor de toma</button>
+      <div id="calc-result" class="hidden"></div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-calc-cotizacion')">Cerrar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nuevo modelo -->
+<div id="modal-new-modelo" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-modelo')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Nuevo modelo</h3><button class="modal-close" onclick="closeModal('modal-new-modelo')">✕</button></div>
+    <form id="form-new-modelo" class="modal-form">
+      <div class="field"><label>Nombre del modelo *</label><input type="text" name="model_name" placeholder="iPhone 18 Pro" required /></div>
+      <div class="field"><label>Línea *</label>
+        <select name="line" required>
+          <option value="base">Base</option>
+          <option value="plus">Plus</option>
+          <option value="pro">Pro</option>
+          <option value="pro_max">Pro Max</option>
+          <option value="se">SE</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-modelo')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear modelo</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal checklist -->
+<div id="modal-checklist" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-checklist')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Checklist de revisión física</h3><button class="modal-close" onclick="closeModal('modal-checklist')">✕</button></div>
+    <div class="modal-form">
+      <div id="checklist-body"></div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-checklist')">Cerrar</button></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- Modal nueva automatización -->
+<div id="modal-new-automatizacion" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-automatizacion')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Nueva automatización</h3><button class="modal-close" onclick="closeModal('modal-new-automatizacion')">✕</button></div>
+    <form id="form-new-automatizacion" class="modal-form">
+      <div class="field"><label>Nombre *</label><input type="text" name="name" required /></div>
+      <div class="field"><label>Tipo *</label>
+        <select name="type" required>
+          <option value="cumpleaños">Cumpleaños</option>
+          <option value="aniversario">Aniversario de compra</option>
+          <option value="vencimiento">Vencimiento de cuota</option>
+          <option value="seguimiento_3m">Seguimiento 3 meses</option>
+          <option value="seguimiento_6m">Seguimiento 6 meses</option>
+          <option value="seguimiento_anual">Seguimiento anual</option>
+          <option value="post_venta">Post venta</option>
+        </select>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Días offset</label><input type="number" name="days_offset" value="0" /></div>
+        <div class="field"><label>Estado</label><select name="status"><option value="activa">Activa</option><option value="desactivada">Desactivada</option><option value="revision">En revisión</option></select></div>
+      </div>
+      <div class="field"><label>Mensaje</label><textarea name="message" rows="3" placeholder="Texto del recordatorio..."></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-automatizacion')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal nuevo/editar pedido -->
+<div id="modal-pedido" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-pedido')"></div>
+  <div class="modal-box modal-box-lg">
+    <div class="modal-header"><h3 id="modal-pedido-title">Nuevo pedido</h3><button class="modal-close" onclick="closeModal('modal-pedido')">✕</button></div>
+    <form id="form-pedido" class="modal-form">
+      <input type="hidden" name="id" />
+      <div class="form-grid">
+        <div class="field"><label>Proveedor *</label><select name="supplier_id" id="pedido-supplier-select" required><option value="">Seleccionar...</option></select></div>
+        <div class="field"><label>Estado</label><select name="status"><option value="pendiente">Pendiente</option><option value="en_camino">En camino</option><option value="llegado">Llegado</option><option value="cancelado">Cancelado</option></select></div>
+        <div class="field"><label>Llegada estimada</label><input type="date" name="estimated_arrival" /></div>
+        <div class="field"><label>Llegada real</label><input type="date" name="actual_arrival" /></div>
+      </div>
+      <div class="field">
+        <label>Productos del pedido</label>
+        <div id="pedido-items-list"></div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="addPedidoItem()" style="margin-top:.5rem">+ Agregar producto</button>
+      </div>
+      <div class="sale-preview" id="pedido-total-preview"></div>
+      <div class="field"><label>Notas</label><textarea name="notes" rows="2"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-pedido')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar pedido</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal detalle pedido -->
+<div id="modal-pedido-detalle" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-pedido-detalle')"></div>
+  <div class="modal-box modal-box-lg">
+    <div class="modal-header"><h3 id="pedido-detalle-title">Pedido</h3><button class="modal-close" onclick="closeModal('modal-pedido-detalle')">✕</button></div>
+    <div id="pedido-detalle-body"></div>
+  </div>
+</div>
+
+<!-- Modal nueva alerta -->
+<div id="modal-new-alerta" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-new-alerta')"></div>
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Nueva alerta de stock</h3><button class="modal-close" onclick="closeModal('modal-new-alerta')">✕</button></div>
+    <form id="form-new-alerta" class="modal-form">
+      <div class="field"><label>Nombre *</label><input type="text" name="name" placeholder="Stock bajo iPhone 15" required /></div>
+      <div class="field"><label>Tipo de alerta *</label>
+        <select name="alert_type" id="alerta-type" required>
+          <option value="modelo_bajo">Stock bajo por modelo</option>
+          <option value="sin_stock">Sin stock de un modelo</option>
+          <option value="antiguedad">Producto con mucho tiempo en stock</option>
+          <option value="capital_alto">Capital inmovilizado alto</option>
+        </select>
+      </div>
+      <div class="field"><label>Filtro de modelo</label><input type="text" name="model_pattern" placeholder="%Pro Max%  o  iPhone 15%" value="%" /><span style="font-size:11px;color:var(--text-muted)">Usá % como comodín. Ej: "%Pro%" para todos los Pro</span></div>
+      <div class="form-grid">
+        <div class="field" id="alerta-threshold-field"><label>Umbral (unidades)</label><input type="number" name="threshold" value="2" /></div>
+        <div class="field hidden" id="alerta-days-field"><label>Días en stock</label><input type="number" name="days_threshold" value="60" /></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-new-alerta')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear alerta</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal edición genérico -->
+<div id="modal-edit" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-edit')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="modal-edit-title">Editar</h3><button class="modal-close" onclick="closeModal('modal-edit')">✕</button></div>
+    <form id="form-edit" class="modal-form">
+      <div id="modal-edit-fields"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="modal-edit-delete" style="margin-right:auto">Eliminar</button>
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-edit')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal import/export stock -->
+<div id="modal-import-stock" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-import-stock')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3>Importar / Exportar stock</h3><button class="modal-close" onclick="closeModal('modal-import-stock')">✕</button></div>
+    <div class="modal-form">
+
+      <div class="import-section">
+        <div class="import-section-title">1. Descargar</div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:.75rem">
+          Bajate el stock actual en CSV, editalo en Excel o Google Sheets, y después subilo de vuelta.
+          <strong>No borres la columna "id"</strong> — es la que permite actualizar los productos existentes.
+        </p>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="window.open('/api/productos/export/csv','_blank')">↓ Stock completo</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('/api/productos/export/csv?status=en_stock','_blank')">↓ Solo en stock</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.open('/api/productos/export/plantilla','_blank')">↓ Plantilla vacía</button>
+        </div>
+      </div>
+
+      <div class="import-section">
+        <div class="import-section-title">2. Subir</div>
+        <div class="field">
+          <label>Archivo CSV</label>
+          <input type="file" id="import-file" accept=".csv,text/csv" />
+        </div>
+        <div class="field">
+          <label>Modo de importación</label>
+          <select id="import-mode">
+            <option value="update">Actualizar existentes y crear nuevos</option>
+            <option value="append">Solo crear nuevos (ignora la columna id)</option>
+          </select>
+        </div>
+        <div id="import-preview" class="hidden"></div>
+        <button class="btn btn-primary" id="import-btn" onclick="procesarImport()" disabled style="width:100%;margin-top:.5rem">
+          Importar productos
+        </button>
+      </div>
+
+      <div class="import-section">
+        <div class="import-section-title">Carga inicial</div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:.5rem">
+          Cargar los 24 productos del inventario base (iPhones, iPad y MacBook).
+        </p>
+        <button class="btn btn-ghost btn-sm" onclick="seedProductos()" style="width:100%">↻ Cargar inventario inicial</button>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-import-stock')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
